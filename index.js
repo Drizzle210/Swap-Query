@@ -7,9 +7,9 @@ import TOKEN_IN_ABI from './abis/weth.json' assert { type: 'json' };
 import 'dotenv/config'
 
 // Deployment Addresses
-const POOL_FACTORY_CONTRACT_ADDRESS = '0x0227628f3F023bb0B980b67D528571c95c6DaC1c'
-const QUOTER_CONTRACT_ADDRESS = '0xEd1f6473345F45b75F8179591dd5bA1888cf2FB3'
-const SWAP_ROUTER_CONTRACT_ADDRESS = '0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E'
+const POOL_FACTORY_CONTRACT_ADDRESS = '0x33128a8fC17869897dcE68Ed026d694621f6FDfD'
+const QUOTER_CONTRACT_ADDRESS = '0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a'
+const SWAP_ROUTER_CONTRACT_ADDRESS = '0x2626664c2603336E57B271c5C0b26F421741e481'
 
 // Provider, Contract & Signer Instances
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL)
@@ -19,8 +19,8 @@ const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider)
 
 // Token Configuration
 const WETH = {
-    chainId: 11155111,
-    address: '0xfff9976782d46cc05630d1f6ebab18b2324d6b14',
+    chainId: 8453,
+    address: '0x4200000000000000000000000000000000000006',
     decimals: 18,
     symbol: 'WETH',
     name: 'Wrapped Ether',
@@ -30,8 +30,8 @@ const WETH = {
   }
   
 const USDC = {
-    chainId: 11155111,
-    address: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
+    chainId: 8543,
+    address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
     decimals: 6,
     symbol: 'USDC',
     name: 'USD//C',
@@ -65,10 +65,12 @@ async function approveToken(tokenAddress, tokenABI, amount, wallet) {
 
 
 async function getPoolInfo(factoryContract, tokenIn, tokenOut) {
+    console.log(tokenOut.address)
     const poolAddress = await factoryContract.getPool(tokenIn.address, tokenOut.address, 3000);
     if (!poolAddress) {
         throw new Error("Failed to get pool address");
     }
+    console.log(poolAddress);
     const poolContract = new ethers.Contract(poolAddress, POOL_ABI, provider);
     const [token0, token1, fee] = await Promise.all([
         poolContract.token0(),
@@ -152,7 +154,7 @@ async function main(swapAmount) {
 
         const quotedAmountOut = await quoteAndLogSwap(quoterContract, fee, signer, amountIn);
 
-        // await wrapETH(0.0001);
+        await wrapETH(0.0001);
 
         // const wethContract = new ethers.Contract(WETH.address, TOKEN_IN_ABI, provider);
         // const balance = await wethContract.balanceOf(signer.address);
@@ -167,4 +169,4 @@ async function main(swapAmount) {
     }
 }
 
-main(0.0001) // Change amount as needed
+main(0.00001) // Change amount as needed
